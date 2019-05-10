@@ -13,7 +13,6 @@ UGrabber::UGrabber()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts
@@ -31,22 +30,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	/// Get player view point
-	FVector  playerViewPointLocation;
-	FRotator playerViewPointRotation;
-
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT playerViewPointLocation,
-		OUT playerViewPointRotation
-	);
-
-	FVector lineTraceEnd = playerViewPointLocation + playerViewPointRotation.Vector() * reach;
-
 	/// if the physics handle is attached 
 	/// move the object that we´re holding
 	if (physicsHandle->GrabbedComponent)
 	{
-		physicsHandle->SetTargetLocation(lineTraceEnd);
+		physicsHandle->SetTargetLocation(GetReachLineEnd());
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Location: %s, Rotation: %s"), *playerViewPointLocation.ToString(), *playerViewPointRotation.ToString())
@@ -63,11 +51,10 @@ void UGrabber::Grab()
 
 	if (actorHit)
 	{
-		physicsHandle->GrabComponent(
+		physicsHandle->GrabComponentAtLocation(
 			componentToGrab, 
 			NAME_None,
-			componentToGrab->GetOwner()->GetActorLocation(),
-			true
+			GetReachLineEnd()
 		);
 	}
 }
@@ -117,27 +104,18 @@ void UGrabber::FindInputComponent()
 
 const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 {
-	/// Get player view point
-	FVector  playerViewPointLocation;
-	FRotator playerViewPointRotation;
-
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT playerViewPointLocation,
-		OUT playerViewPointRotation
-	);
-
-	FVector  lineTraceEnd = playerViewPointLocation + playerViewPointRotation.Vector() * reach;
-
+	/*
 	DrawDebugLine(
 		GetWorld(),
 		playerViewPointLocation,
-		lineTraceEnd,
+		PlayerViewPoint(),
 		FColor(255, 0, 0),
 		false,
 		0.f,
 		0.f,
 		10
 	);
+	*/
 
 	/// Set up Query Parameters
 	FCollisionQueryParams traceParameters(FName(TEXT("")), false, GetOwner());
@@ -147,8 +125,8 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 	/// Object type == physics body. Used to filter what we want to detect
 	GetWorld()->LineTraceSingleByObjectType(
 		OUT hit,
-		playerViewPointLocation,
-		lineTraceEnd,
+		GetReachLineStart(),
+		GetReachLineEnd(),
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), /// Le decimos que solo detecte physics body
 		traceParameters
 	);
@@ -161,5 +139,35 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 	}
 
 	return hit;
+}
+
+FVector UGrabber::GetReachLineEnd()
+{
+	/// Get player view point
+	FVector  playerViewPointLocation;
+	FRotator playerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT playerViewPointLocation,
+		OUT playerViewPointRotation
+	);
+
+	FVector lineTraceEnd = playerViewPointLocation + playerViewPointRotation.Vector() * reach;
+
+	return lineTraceEnd;
+}
+
+FVector UGrabber::GetReachLineStart()
+{
+	/// Get player view point
+	FVector  playerViewPointLocation;
+	FRotator playerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT playerViewPointLocation,
+		OUT playerViewPointRotation
+	);
+
+	return playerViewPointLocation;
 }
 

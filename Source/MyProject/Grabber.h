@@ -41,4 +41,8 @@ private:
 
 	/// Return hit for first physics body in reach
 	const FHitResult GetFirstPhysicsBodyInReach();
+
+	/// Get player view point
+	FVector GetReachLineEnd();
+	FVector GetReachLineStart();
 };
