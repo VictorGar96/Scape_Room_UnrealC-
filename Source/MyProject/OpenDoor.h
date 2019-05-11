@@ -5,8 +5,10 @@
 #include "Engine/TriggerVolume.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "OpenDoor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYPROJECT_API UOpenDoor : public UActorComponent
@@ -21,15 +23,22 @@ public:
 	float openAngle = -60.f;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* pressurePlate;
+	ATriggerVolume* pressurePlate = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float doorCloseDelay = 1.f;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnOpenRequest onOpenRequest;
+
+
+	UPROPERTY(BlueprintAssignable)
+	FOnOpenRequest onCloseRequest;
+
 	float lastDoorOpenTime;
 
-	AActor* actorToOverlap;
-	AActor* owner;
+	
+	AActor* owner = nullptr;
 
 
 protected:
@@ -44,4 +53,5 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	float GetTotalMassOfActor();
 };
