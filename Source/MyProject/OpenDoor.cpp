@@ -14,6 +14,12 @@ UOpenDoor::UOpenDoor()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	//static ConstructorHelpers::FObjectFinder openDoorSoundObject(TEXT("SoundCue'/Game/Audio/open_door.open_door'"));
+
+	//if (openDoorSoundObject.Succeeded())
+	//{
+	//	openDoorSound = openDoorSoundObject.Object;
+	//}
 }
 
 
@@ -24,10 +30,13 @@ void UOpenDoor::BeginPlay()
 
 	owner = GetOwner();
 
+	
+
 	if (!pressurePlate)
 	{ 
 		UE_LOG(LogTemp, Error, TEXT("%s missing preasure plate"), *GetOwner()->GetName()); 
 	}
+
 }
 
 void UOpenDoor::OpenDoor()

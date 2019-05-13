@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "Runtime/Engine/Classes/Components/AudioComponent.h"
 #include "OpenDoor.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest);
@@ -21,6 +22,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float openAngle = -60.f;
+
+	//UPROPERTY(EditDefaultsOnly, Category = Audio, meta = (AllowPrivateAcces = "true"))
+	//class USoundCue* openDoorSound = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* pressurePlate = nullptr;
